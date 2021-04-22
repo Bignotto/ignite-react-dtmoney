@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import Modal from "react-modal";
 import { Container, RadioBox, TransactionCategoryContainer } from "./styles";
 
 import closeImg from "../../assets/close.svg";
 import creditImg from "../../assets/income.svg";
 import debitImg from "../../assets/outcome.svg";
+import { api } from "../../services/api";
 
 interface NewTransactionModalProps {
   isOpen: boolean;
@@ -15,6 +16,22 @@ export function NewtransactionModal({
   onRequestClose,
 }: NewTransactionModalProps) {
   const [type, setType] = useState("");
+  const [title, setTitle] = useState("");
+  const [amount, setAmount] = useState(0);
+  const [category, setCategory] = useState("");
+
+  async function handleCreateNewTransaction(event: FormEvent) {
+    event.preventDefault();
+    await api.post("transactions", {
+      id: Math.floor(Math.random() * 99),
+      title,
+      amount,
+      type,
+      category,
+      createdAt: new Date(),
+    });
+    onRequestClose();
+  }
 
   return (
     <Modal
@@ -31,10 +48,19 @@ export function NewtransactionModal({
         <img src={closeImg} alt="Fechar nova transação" />
       </button>
 
-      <Container>
+      <Container onSubmit={event => handleCreateNewTransaction(event)}>
         <h2>Nova transação:</h2>
-        <input placeholder="Descrição" />
-        <input type="number" placeholder="Valor" />
+        <input
+          placeholder="Descrição"
+          value={title}
+          onChange={e => setTitle(e.target.value)}
+        />
+        <input
+          type="number"
+          placeholder="Valor"
+          value={amount}
+          onChange={e => setAmount(Number(e.target.value))}
+        />
 
         <TransactionCategoryContainer>
           <RadioBox
@@ -61,12 +87,12 @@ export function NewtransactionModal({
           </RadioBox>
         </TransactionCategoryContainer>
 
-        <input placeholder="Categoria" />
-        <button
-          type="button"
-          className="react-modal-save-button"
-          onClick={onRequestClose}
-        >
+        <input
+          placeholder="Categoria"
+          value={category}
+          onChange={e => setCategory(e.target.value)}
+        />
+        <button className="react-modal-save-button" type="submit">
           Salvar
         </button>
       </Container>
