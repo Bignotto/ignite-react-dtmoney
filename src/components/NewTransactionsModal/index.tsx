@@ -24,7 +24,12 @@ export function NewtransactionModal({
 
   async function handleCreateNewTransaction(event: FormEvent) {
     event.preventDefault();
-    createTransaction({ title, amount, category, type });
+    await createTransaction({ title, amount, category, type });
+    setType("");
+    setTitle("");
+    setAmount(0);
+    setCategory("");
+    onRequestClose();
   }
 
   return (
